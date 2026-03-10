@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingCart, User, Menu, X, Search, Moon, Sun, Heart, ChevronRight, Instagram, Linkedin, Facebook, Watch, Headphones, Laptop, Smartphone, ArrowRight, Home, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 export default function Layout({ children }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -21,6 +23,8 @@ export default function Layout({ children }) {
   });
   const location = useLocation();
   const navigate = useNavigate();
+  const { totalItems } = useCart();
+  const { totalWishlist } = useWishlist();
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -156,12 +160,19 @@ export default function Layout({ children }) {
             </div>
             <Link to="/wishlist" className="relative p-2 hover:bg-muted rounded-full transition-colors group hidden sm:block">
               <Heart size={20} className="group-hover:scale-110 transition-transform text-red-500" />
+              {totalWishlist > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {totalWishlist}
+                </span>
+              )}
             </Link>
             <Link to="/cart" className="relative p-2 hover:bg-muted rounded-full transition-colors group">
               <ShoppingCart size={20} className="group-hover:scale-110 transition-transform" />
-              <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
-                3
-              </span>
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
             </Link>
             <button className="md:hidden p-2 hover:bg-muted rounded-full transition-colors" onClick={() => setIsMobileMenuOpen(true)}>
               <Menu size={24} />

@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, ShoppingCart, Star, Search, ChevronRight, X, Eye, Zap, ArrowRight, ArrowDownNarrowWide } from 'lucide-react';
+import { Filter, ShoppingCart, Star, Search, ChevronRight, X, Eye, Zap, ArrowRight, ArrowDownNarrowWide, Heart, ShoppingBag } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 const QuickViewModal = ({ product, onClose }) => {
+  const { addToCart } = useCart();
+  const { toggleWishlist, isWishlisted } = useWishlist();
   if (!product) return null;
   return (
     <motion.div
@@ -42,8 +46,21 @@ const QuickViewModal = ({ product, onClose }) => {
               <span className="text-4xl font-black text-primary italic tracking-tighter">${product.price}</span>
             </div>
             <div className="flex gap-4">
-              <button className="flex-1 bg-primary text-white py-6 rounded-2xl font-black text-lg hover:shadow-xl hover:shadow-primary/20 transition-all active:scale-95">SEPETE EKLE</button>
-              <Link to={`/product/${product.id}`} className="bg-muted p-6 rounded-2xl hover:bg-primary/10 hover:text-primary transition-colors"><ArrowRight size={24} /></Link>
+              <button
+                onClick={() => { addToCart(product); onClose(); }}
+                className="flex-1 flex items-center justify-center gap-2 bg-primary text-white py-5 rounded-2xl font-black text-lg hover:shadow-xl hover:shadow-primary/20 transition-all active:scale-95"
+              >
+                <ShoppingBag size={20} /> SEPETE EKLE
+              </button>
+              <button
+                onClick={() => toggleWishlist(product)}
+                className={`p-5 rounded-2xl border-2 transition-all ${ isWishlisted(product._id || product.id) ? 'border-red-500 bg-red-500/10 text-red-500' : 'border-border hover:border-red-500 hover:text-red-500' }`}
+              >
+                <Heart size={22} className={isWishlisted(product._id || product.id) ? 'fill-red-500' : ''} />
+              </button>
+              <Link to={`/product/${product.id}`} className="bg-muted p-5 rounded-2xl hover:bg-primary/10 hover:text-primary transition-colors">
+                <ArrowRight size={22} />
+              </Link>
             </div>
           </div>
         </div>
@@ -52,7 +69,11 @@ const QuickViewModal = ({ product, onClose }) => {
   );
 };
 
-const ProductCard = ({ product, onQuickView }) => (
+const ProductCard = ({ product, onQuickView }) => {
+  const { addToCart } = useCart();
+  const { toggleWishlist, isWishlisted } = useWishlist();
+  const wishlisted = isWishlisted(product._id || product.id);
+  return (
   <motion.div
     layout
     initial={{ opacity: 0, y: 20 }}
@@ -61,34 +82,37 @@ const ProductCard = ({ product, onQuickView }) => (
     className="group relative bg-card p-4 rounded-[2.5rem] border border-border/50 hover:border-primary/40 transition-all hover:shadow-2xl hover:shadow-primary/10 overflow-hidden"
   >
     <div className="relative h-72 rounded-[2rem] overflow-hidden mb-6 bg-muted/30">
-      <img
-        src={product.image}
-        alt={product.name}
-        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-      />
+      <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
       <div className="absolute top-4 right-4 glass px-3 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-md border">
-         <Star size={14} className="text-yellow-500 fill-yellow-500" />
-         <span className="text-xs font-black">{product.rating}</span>
+        <Star size={14} className="text-yellow-500 fill-yellow-500" />
+        <span className="text-xs font-black">{product.rating}</span>
       </div>
+      {/* Favori butonu */}
+      <button
+        onClick={() => toggleWishlist(product)}
+        className={`absolute top-4 left-4 p-2.5 rounded-full glass border transition-all ${ wishlisted ? 'bg-red-500/20 border-red-500/40 text-red-500' : 'hover:bg-white hover:text-red-500' }`}
+      >
+        <Heart size={16} className={wishlisted ? 'fill-red-500' : ''} />
+      </button>
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 p-6">
-         <button 
-           onClick={() => onQuickView(product)}
-           className="p-4 bg-white text-black rounded-2xl hover:bg-primary hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0 duration-300"
-         >
-           <Eye size={20} />
-         </button>
-         <Link 
-           to={`/product/${product.id}`}
-           className="flex-1 bg-primary text-white py-4 rounded-2xl font-black text-center text-sm hover:scale-105 transition-all transform translate-y-4 group-hover:translate-y-0 duration-500"
-         >
-           DETAYLAR
-         </Link>
+        <button
+          onClick={() => onQuickView(product)}
+          className="p-4 bg-white text-black rounded-2xl hover:bg-primary hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0 duration-300"
+        >
+          <Eye size={20} />
+        </button>
+        <button
+          onClick={() => addToCart(product)}
+          className="flex-1 bg-primary text-white py-4 rounded-2xl font-black text-center text-sm hover:scale-105 transition-all transform translate-y-4 group-hover:translate-y-0 duration-500"
+        >
+          SEPETE EKLE
+        </button>
       </div>
     </div>
     <div className="px-2 space-y-2">
       <div className="flex justify-between items-start">
-         <p className="text-xs font-bold text-primary uppercase tracking-widest">{product.category}</p>
-         <p className="text-lg font-black tracking-tighter">${product.price}</p>
+        <p className="text-xs font-bold text-primary uppercase tracking-widest">{product.category}</p>
+        <p className="text-lg font-black tracking-tighter">${product.price}</p>
       </div>
       <Link to={`/product/${product.id}`}>
         <h3 className="text-xl font-bold tracking-tight line-clamp-1 group-hover:text-primary transition-colors">{product.name}</h3>
@@ -96,7 +120,8 @@ const ProductCard = ({ product, onQuickView }) => (
       <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed font-medium">{product.description}</p>
     </div>
   </motion.div>
-);
+  );
+};
 
 const FlashSale = () => {
   const [timeLeft, setTimeLeft] = useState({ hours: 2, mins: 45, secs: 12 });

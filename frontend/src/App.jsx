@@ -16,29 +16,35 @@ import Success from './pages/Success';
 import Shipping from './pages/Shipping';
 import Returns from './pages/Returns';
 import Profile from './pages/Profile';
+import { CartProvider } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 
 export default function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/trending" element={<Trending />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/success" element={<Success />} />
-          <Route path="/shipping" element={<Shipping />} />
-          <Route path="/returns" element={<Returns />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <CartProvider>
+      <WishlistProvider>
+        <Router>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/trending" element={<Trending />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/success" element={<Success />} />
+              <Route path="/shipping" element={<Shipping />} />
+              <Route path="/returns" element={<Returns />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/inventory" element={<Inventory />} />
+              <Route path="/login" element={<Login />} />
+            </Routes>
+          </Layout>
+        </Router>
+      </WishlistProvider>
+    </CartProvider>
   );
 }
